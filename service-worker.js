@@ -1,12 +1,16 @@
 const STATE_KEY = 'signflow:state';
-const API_BASE_URL = 'http://localhost:5055/api/v1';
+const CONFIG_KEY = 'signflow:config';
 const defaultState = {
   isEnabled: false,
   status: 'idle',
   tabId: null,
   lastSequence: [],
   chunkCount: 0,
-  lastUpdated: null
+  lastUpdated: null,
+  lastError: null
+};
+const defaultConfig = {
+  apiBaseUrl: 'http://localhost:5055/api/v1'
 };
 
 const DEMO_SIGN_SEQUENCES = [
@@ -18,7 +22,10 @@ const DEMO_SIGN_SEQUENCES = [
 ];
 
 chrome.runtime.onInstalled.addListener(async () => {
-  await chrome.storage.local.set({ [STATE_KEY]: defaultState });
+  await chrome.storage.local.set({
+    [STATE_KEY]: defaultState,
+    [CONFIG_KEY]: defaultConfig
+  });
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -36,6 +43,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return { ok: true, state: await startFlow(tabId) };
       }
       return { ok: true, state: await stopFlow() };
+    },
+    'popup:get-config': async () => {
+      const config = await getConfig();
+      return { ok: true, config };
+    },
+    'popup:set-config': async () => {
+      const config = await setConfig({ apiBaseUrl: sanitizeApiBase(message.apiBaseUrl) });
+      return { ok: true, config };
+    },
+    'popup:test-api': async () => {
+      const config = await getConfig();
+      const alive = await pingApi(config.apiBaseUrl);
+      return { ok: true, alive };
     },
     'popup:recenter': async () => {
       const tabId = message.tabId;
@@ -102,7 +122,8 @@ async function startFlow(tabId) {
       isEnabled: true,
       status: 'listening',
       tabId,
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
+      lastError: null
     },
     { broadcast: true }
   );
@@ -115,10 +136,7 @@ async function stopFlow() {
   if (state.tabId) {
     await sendToTab(state.tabId, { type: 'background:stop-capture' }).catch(() => {});
   }
-  const next = await setState(
-    { ...defaultState, chunkCount: 0, lastSequence: [] },
-    { broadcast: true }
-  );
+  const next = await setState({ ...defaultState }, { broadcast: true });
   return next;
 }
 
@@ -148,16 +166,21 @@ async function handleAudioChunk(payload, sender) {
     return;
   }
 
-  const backendResponse = await sendChunkToBackend(payload).catch((error) => {
+  let backendResponse = null;
+  let backendError = null;
+  try {
+    backendResponse = await sendChunkToBackend(payload);
+  } catch (error) {
+    backendError = error;
     console.error('[SignFlow] Backend request failed', error);
-    return null;
-  });
+  }
 
   const updatedState = await setState(
     {
-      status: 'streaming',
+      status: backendResponse ? 'streaming' : 'error',
       chunkCount: state.chunkCount + 1,
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
+      lastError: backendError ? backendError.message : null
     },
     { broadcast: true }
   );
@@ -186,15 +209,17 @@ function getDemoGlosses(chunkCount) {
 }
 
 async function sendChunkToBackend(payload) {
-  if (!API_BASE_URL) {
-    return null;
+  const { apiBaseUrl } = await getConfig();
+  if (!apiBaseUrl) {
+    throw new Error('API base URL is not configured.');
   }
+  const endpoint = `${apiBaseUrl.replace(/\/$/, '')}/sign-sequence`;
   const body = {
     audioBase64: payload.base64,
     mimeType: payload.mimeType,
     locale: payload.locale || 'en-US'
   };
-  const response = await fetch(`${API_BASE_URL}/sign-sequence`, {
+  const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -205,4 +230,47 @@ async function sendChunkToBackend(payload) {
     throw new Error(`Backend responded with ${response.status}`);
   }
   return response.json();
+}
+
+async function getConfig() {
+  const stored = await chrome.storage.local.get(CONFIG_KEY);
+  return { ...defaultConfig, ...(stored?.[CONFIG_KEY] ?? {}) };
+}
+
+async function setConfig(patch) {
+  const next = { ...(await getConfig()), ...patch };
+  await chrome.storage.local.set({ [CONFIG_KEY]: next });
+  await broadcastConfig(next);
+  return next;
+}
+
+async function broadcastConfig(config) {
+  try {
+    await chrome.runtime.sendMessage({ type: 'config:updated', config });
+  } catch (error) {
+    if (!error?.message?.includes('Receiving end does not exist')) {
+      console.warn('[SignFlow] Failed to broadcast config', error);
+    }
+  }
+}
+
+function sanitizeApiBase(value) {
+  if (!value) {
+    return defaultConfig.apiBaseUrl;
+  }
+  return value.trim().replace(/\s+/g, '');
+}
+
+async function pingApi(apiBaseUrl) {
+  if (!apiBaseUrl) {
+    return false;
+  }
+  try {
+    const response = await fetch(`${apiBaseUrl.replace(/\/$/, '')}/health`, {
+      method: 'GET'
+    });
+    return response.ok;
+  } catch (error) {
+    return false;
+  }
 }

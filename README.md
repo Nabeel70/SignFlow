@@ -48,13 +48,14 @@ SignFlow Browser extension/
 | Audio capture | Web Audio microphone capture, MediaRecorder chunking, analyser-based level meter, permission handling | `contentScript.js` |
 | Streaming | Each audio chunk is encoded to base64 and posted to `/api/v1/sign-sequence` (configurable API base), with automatic fallback to deterministic demo glosses if the backend errors | `contentScript.js`, `service-worker.js` |
 | Overlay | Draggable floating video card with live captions, status header, mic level visual, and per-gloss video playback sourcing either bundled assets or backend URLs | `contentScript.js`, `overlay.css`, `assets/signs/` |
+| Backend controls | Popup lets you set/test the backend base URL and surfaces the last error message whenever the API fails, so QA/devs can switch between environments without rebuilding | `popup.html`, `popup.js`, `service-worker.js` |
 
 ### How The Extension Communicates
 
 1. Popup toggle (`popup.js`) sends `popup:toggle` messages to `service-worker.js`.
 2. Service worker injects `contentScript.js` if absent, updates state in `chrome.storage`, and instructs the content script to start or stop capturing.
 3. Content script uses `MediaRecorder` to emit ~750 ms chunks -> base64 -> `content:audio-chunk` to the service worker.
-4. Service worker posts each chunk to `POST {API_BASE_URL}/sign-sequence` (`API_BASE_URL` defaults to `http://localhost:5055/api/v1`) and receives:
+4. Service worker posts each chunk to `POST {backendEndpoint}/sign-sequence` (endpoint defaults to `http://localhost:5055/api/v1` but can be edited/tested from the popup) and receives:
    ```json
    {
      "transcript": "...",
@@ -66,12 +67,11 @@ SignFlow Browser extension/
    ```
 5. The content script receives `background:play-signs` with either `videos` (preferred) or `glosses` and plays the clips inside the overlay.
 
-### Remaining Frontend Tasks
+### Next Frontend Enhancements
 
-- **Dynamic API target** – expose `API_BASE_URL` as an options page or environment-driven config so QA can switch between staging/production without editing `service-worker.js`.
-- **Graceful reconnection UI** – show toast/badge when backend requests fail repeatedly (currently only logs and falls back to demo glosses).
 - **Extended sign media** – add the AI-generated catalogue (40–50 clips) to the extension bundle or host on a CDN once the backend exposes them.
 - **Permissions polishing** – consider microphone capture persistence (offscreen document) to survive tab refreshes without requiring the popup toggle each time.
+- **Overlay personalization** – allow users to resize, theme, or pin the floating video card for different meeting layouts.
 
 ---
 
@@ -125,8 +125,9 @@ npm run dev            # starts on http://localhost:5055
 - Load the extension as an unpacked Chrome extension:
   1. `chrome://extensions` → enable Developer Mode → “Load unpacked” → select this folder.
   2. Open the popup, toggle ON, allow microphone access.
-  3. With the backend running, observe requests to `/api/v1/sign-sequence` in DevTools → Network.
-  4. Use the “Show overlay again” button if the draggable card is lost.
+  3. Set the backend endpoint under “Backend endpoint” (defaults to `http://localhost:5055/api/v1`) and hit **Test** to confirm connectivity.
+  4. With the backend running, observe requests to `/api/v1/sign-sequence` in DevTools → Network.
+  5. Use the “Show overlay again” button if the draggable card is lost.
 
 ---
 

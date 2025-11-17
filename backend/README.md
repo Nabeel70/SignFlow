@@ -21,6 +21,7 @@ The server listens on `http://localhost:5055` by default and exposes the followi
 
 | Endpoint | Description |
 | --- | --- |
+| `GET /health` | Lightweight status check (used by the extension's "Test" button) |
 | `POST /transcribe` | Runs Gemini STT on `audioBase64` blobs (WebM/Opus) |
 | `POST /translate` | Simplifies natural language into ASL-friendly keywords + gloss sequence |
 | `POST /sign-sequence` | End-to-end pipeline: transcribe (optional), translate, lookup matching sign videos |
@@ -51,4 +52,4 @@ When audio is omitted you can pass an existing transcript:
 
 ## Connecting The Extension
 
-The Chrome extension service worker posts microphone chunks to `POST /api/v1/sign-sequence`. Update `API_BASE_URL` in `service-worker.js` if you deploy the backend to another host.
+The Chrome extension service worker posts microphone chunks to `POST /api/v1/sign-sequence`. Set the desired endpoint inside the extension popup (Backend endpoint section) if you deploy the backend to another host.

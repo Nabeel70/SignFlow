@@ -1,4 +1,5 @@
 const STATE_KEY = 'signflow:state';
+const API_BASE_URL = 'http://localhost:5055/api/v1';
 const defaultState = {
   isEnabled: false,
   status: 'idle',
@@ -147,8 +148,10 @@ async function handleAudioChunk(payload, sender) {
     return;
   }
 
-  const arrayBuffer = base64ToArrayBuffer(payload.base64);
-  await simulateStream(arrayBuffer, payload.mimeType);
+  const backendResponse = await sendChunkToBackend(payload).catch((error) => {
+    console.error('[SignFlow] Backend request failed', error);
+    return null;
+  });
 
   const updatedState = await setState(
     {
@@ -159,34 +162,47 @@ async function handleAudioChunk(payload, sender) {
     { broadcast: true }
   );
 
-  const glosses = getDemoGlosses(updatedState.chunkCount);
+  const glosses =
+    backendResponse?.glossSequence?.length > 0
+      ? backendResponse.glossSequence
+      : getDemoGlosses(updatedState.chunkCount);
   await setState({ lastSequence: glosses }, { broadcast: true });
   try {
     await sendToTab(state.tabId, {
       type: 'background:play-signs',
-      glosses
+      glosses,
+      videos: backendResponse?.videos,
+      transcript: backendResponse?.transcript,
+      keywords: backendResponse?.keywords
     });
   } catch (error) {
     console.warn('[SignFlow] Unable to forward glosses', error);
   }
 }
 
-function base64ToArrayBuffer(base64) {
-  const binary = atob(base64);
-  const length = binary.length;
-  const bytes = new Uint8Array(length);
-  for (let i = 0; i < length; i += 1) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  return bytes.buffer;
-}
-
-async function simulateStream(buffer, mimeType) {
-  console.debug('[SignFlow] Streaming chunk', { bytes: buffer.byteLength, mimeType });
-  await new Promise((resolve) => setTimeout(resolve, 100));
-}
-
 function getDemoGlosses(chunkCount) {
   const index = chunkCount % DEMO_SIGN_SEQUENCES.length;
   return DEMO_SIGN_SEQUENCES[index];
+}
+
+async function sendChunkToBackend(payload) {
+  if (!API_BASE_URL) {
+    return null;
+  }
+  const body = {
+    audioBase64: payload.base64,
+    mimeType: payload.mimeType,
+    locale: payload.locale || 'en-US'
+  };
+  const response = await fetch(`${API_BASE_URL}/sign-sequence`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+  if (!response.ok) {
+    throw new Error(`Backend responded with ${response.status}`);
+  }
+  return response.json();
 }

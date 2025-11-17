@@ -1,0 +1,102 @@
+[
+  {
+    "id": "hello",
+    "gloss": "HELLO",
+    "keywords": ["hello", "hi", "greetings", "hey"],
+    "topics": ["greeting"],
+    "videoFile": "hello.webm",
+    "thumbnail": "hello.png",
+    "durationMs": 1800,
+    "embedding": [0.9, 0.1, 0.05]
+  },
+  {
+    "id": "today",
+    "gloss": "TODAY",
+    "keywords": ["today", "now", "currently"],
+    "topics": ["time"],
+    "videoFile": "today.webm",
+    "thumbnail": "today.png",
+    "durationMs": 2100,
+    "embedding": [0.75, 0.2, 0.3]
+  },
+  {
+    "id": "meeting",
+    "gloss": "MEETING",
+    "keywords": ["meeting", "sync", "catchup", "discussion"],
+    "topics": ["work"],
+    "videoFile": "meeting.webm",
+    "thumbnail": "meeting.png",
+    "durationMs": 2400,
+    "embedding": [0.6, 0.6, 0.5]
+  },
+  {
+    "id": "team",
+    "gloss": "TEAM",
+    "keywords": ["team", "group", "colleagues"],
+    "topics": ["work"],
+    "videoFile": "team.webm",
+    "thumbnail": "team.png",
+    "durationMs": 2200,
+    "embedding": [0.55, 0.65, 0.45]
+  },
+  {
+    "id": "project",
+    "gloss": "PROJECT",
+    "keywords": ["project", "plan", "build"],
+    "topics": ["work"],
+    "videoFile": "project.webm",
+    "thumbnail": "project.png",
+    "durationMs": 2600,
+    "embedding": [0.67, 0.58, 0.45]
+  },
+  {
+    "id": "question",
+    "gloss": "QUESTION",
+    "keywords": ["question", "ask", "doubt"],
+    "topics": ["conversation"],
+    "videoFile": "question.webm",
+    "thumbnail": "question.png",
+    "durationMs": 1800,
+    "embedding": [0.3, 0.9, 0.4]
+  },
+  {
+    "id": "help",
+    "gloss": "HELP",
+    "keywords": ["help", "support", "assist"],
+    "topics": ["conversation"],
+    "videoFile": "help.webm",
+    "thumbnail": "help.png",
+    "durationMs": 2000,
+    "embedding": [0.4, 0.85, 0.25]
+  },
+  {
+    "id": "thanks",
+    "gloss": "THANK-YOU",
+    "keywords": ["thank", "thanks", "appreciate", "gratitude"],
+    "topics": ["gratitude"],
+    "videoFile": "thanks.webm",
+    "thumbnail": "thanks.png",
+    "durationMs": 1900,
+    "embedding": [0.8, 0.25, 0.35]
+  },
+  {
+    "id": "good",
+    "gloss": "GOOD",
+    "keywords": ["good", "great", "fine"],
+    "topics": ["sentiment"],
+    "videoFile": "good.webm",
+    "thumbnail": "good.png",
+    "durationMs": 1600,
+    "embedding": [0.85, 0.4, 0.2]
+  },
+  {
+    "id": "later",
+    "gloss": "LATER",
+    "keywords": ["later", "after", "afterward"],
+    "topics": ["time"],
+    "videoFile": "later.webm",
+    "thumbnail": "later.png",
+    "durationMs": 1750,
+    "embedding": [0.45, 0.2, 0.85]
+  }
+]

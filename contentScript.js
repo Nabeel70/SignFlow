@@ -23,7 +23,7 @@
       'background:play-signs': () => {
         overlay.show();
         overlay.setStatus('Streaming signs', 'streaming');
-        animator.playSequence(message.glosses);
+        animator.playSequence(message.videos?.length ? message.videos : message.glosses);
       },
       'background:show-overlay': () => {
         overlay.show();
@@ -159,7 +159,8 @@
         base64,
         mimeType: blob.type || 'audio/webm',
         sequence: chunkSequence,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        locale: navigator.language || 'en-US'
       }
     });
   }
@@ -294,14 +295,20 @@
       ['TODAY', chrome.runtime.getURL('assets/signs/today.webm')],
       ['MEETING', chrome.runtime.getURL('assets/signs/meeting.webm')]
     ]);
+    this.defaultGloss = 'HELLO';
     videoEl.loop = false;
     videoEl.addEventListener('ended', () => {
       this.playNext();
     });
   }
 
-  SignAnimator.prototype.playSequence = function playSequence(glosses = []) {
-    this.queue = glosses.map((gloss) => gloss.toUpperCase());
+  SignAnimator.prototype.playSequence = function playSequence(sequence = []) {
+    if (!Array.isArray(sequence) || sequence.length === 0) {
+      this.captionEl.textContent = 'Awaiting speech...';
+      this.isPlaying = false;
+      return;
+    }
+    this.queue = normalizeSequence(sequence, this.signSources, this.defaultGloss);
     this.isPlaying = true;
     this.playNext();
   };
@@ -313,13 +320,38 @@
       this.isPlaying = false;
       return;
     }
-    const gloss = this.queue.shift();
-    const src = this.signSources.get(gloss) || this.signSources.get('HELLO');
-    this.captionEl.textContent = gloss;
+    const clip = this.queue.shift();
+    const src =
+      clip.videoUrl ||
+      this.signSources.get(clip.gloss) ||
+      this.signSources.get(this.defaultGloss);
+    this.captionEl.textContent = clip.gloss;
     this.videoEl.src = src;
     this.videoEl.currentTime = 0;
     this.videoEl.play().catch(() => {
-      this.captionEl.textContent = `${gloss} (video blocked)`;
+      this.captionEl.textContent = `${clip.gloss} (video blocked)`;
     });
   };
+
+  function normalizeSequence(sequence, sources, defaultGloss) {
+    return sequence.map((entry) => {
+      if (typeof entry === 'string') {
+        const gloss = entry.toUpperCase();
+        return {
+          gloss,
+          requestedGloss: gloss,
+          videoUrl: sources.get(gloss) || sources.get(defaultGloss),
+          score: 0.5
+        };
+      }
+      const gloss = (entry.gloss || entry.requestedGloss || defaultGloss).toUpperCase();
+      return {
+        gloss,
+        requestedGloss: entry.requestedGloss || gloss,
+        videoUrl: entry.videoUrl || sources.get(gloss) || sources.get(defaultGloss),
+        score: entry.score ?? 0.5,
+        durationMs: entry.durationMs || 2000
+      };
+    });
+  }
 })();

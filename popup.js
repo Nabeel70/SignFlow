@@ -37,7 +37,8 @@ const elements = {
   apiInput: document.getElementById('apiBaseInput'),
   apiStatus: document.getElementById('apiStatus'),
   saveApiBtn: document.getElementById('saveApiBtn'),
-  testApiBtn: document.getElementById('testApiBtn')
+  testApiBtn: document.getElementById('testApiBtn'),
+  overlayScaleSelect: document.getElementById('overlayScaleSelect')
 };
 
 let currentState = null;
@@ -53,6 +54,7 @@ function init() {
   elements.refreshBtn.addEventListener('click', () => refreshState(true));
   elements.saveApiBtn.addEventListener('click', saveApiConfig);
   elements.testApiBtn.addEventListener('click', testApiEndpoint);
+  elements.overlayScaleSelect.addEventListener('change', handleOverlayScaleChange);
 
   chrome.runtime.onMessage.addListener((message) => {
     if (message?.type === 'state:updated') {
@@ -185,6 +187,7 @@ function applyConfig() {
     return;
   }
   elements.apiInput.value = currentConfig.apiBaseUrl || '';
+  elements.overlayScaleSelect.value = currentConfig.overlayScale || 'medium';
   renderApiStatus(`Current: ${describeApiBase(currentConfig.apiBaseUrl)}`, null);
 }
 
@@ -197,7 +200,8 @@ async function saveApiConfig() {
   try {
     const response = await chrome.runtime.sendMessage({
       type: 'popup:set-config',
-      apiBaseUrl: raw
+      apiBaseUrl: raw,
+      overlayScale: elements.overlayScaleSelect.value
     });
     if (!response?.ok) {
       throw new Error(response?.error || 'Unable to save endpoint.');
@@ -244,6 +248,7 @@ function setConfigBusy(value) {
   configBusy = value;
   elements.saveApiBtn.disabled = value;
   elements.testApiBtn.disabled = value;
+  elements.overlayScaleSelect.disabled = value;
 }
 
 function renderApiStatus(text, success) {
@@ -265,4 +270,32 @@ function describeApiBase(url) {
     return 'default local server';
   }
   return url;
+}
+
+async function handleOverlayScaleChange(event) {
+  const scale = event.target.value;
+  if (configBusy) {
+    return;
+  }
+  setConfigBusy(true);
+  try {
+    const response = await chrome.runtime.sendMessage({
+      type: 'popup:set-config',
+      overlayScale: scale
+    });
+    if (!response?.ok) {
+      throw new Error(response?.error || 'Unable to update overlay size.');
+    }
+    currentConfig = response.config;
+    applyConfig();
+    showToast('Overlay size updated.');
+  } catch (error) {
+    console.error('[SignFlow] Overlay scale update failed', error);
+    showToast(error.message, true);
+    if (currentConfig?.overlayScale) {
+      elements.overlayScaleSelect.value = currentConfig.overlayScale;
+    }
+  } finally {
+    setConfigBusy(false);
+  }
 }

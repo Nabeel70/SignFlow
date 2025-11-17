@@ -4,6 +4,8 @@
   }
   window.__signflowInitialized = true;
 
+  const CONFIG_KEY = 'signflow:config';
+
   const overlay = createOverlay();
   const animator = new SignAnimator(overlay.videoEl, overlay.captionEl);
 
@@ -14,6 +16,14 @@
   let meterFrame = null;
   let chunkSequence = 0;
   let isCapturing = false;
+
+  hydrateOverlayPreferences();
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && changes[CONFIG_KEY]) {
+      const next = changes[CONFIG_KEY].newValue || {};
+      overlay.setScale(next.overlayScale || 'medium');
+    }
+  });
 
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const handlers = {
@@ -91,6 +101,16 @@
       chrome.runtime.sendMessage({ type: 'content:status', status: 'error' });
       throw error;
     }
+  }
+
+  function hydrateOverlayPreferences() {
+    chrome.storage.local.get(CONFIG_KEY, (result) => {
+      if (chrome.runtime.lastError) {
+        return;
+      }
+      const config = result?.[CONFIG_KEY] || {};
+      overlay.setScale(config.overlayScale || 'medium');
+    });
   }
 
   async function stopCapture() {
@@ -188,6 +208,7 @@
     `;
     document.documentElement.appendChild(root);
     root.dataset.state = 'idle';
+    root.dataset.scale = 'medium';
 
     const statusText = root.querySelector('.signflow-status-text');
     const levelBar = root.querySelector('.signflow-level-bar');
@@ -222,6 +243,10 @@
         root.style.top = '96px';
         root.style.right = '32px';
         root.style.left = 'auto';
+      },
+      setScale(scale) {
+        const normalized = ['small', 'medium', 'large'].includes(scale) ? scale : 'medium';
+        root.dataset.scale = normalized;
       }
     };
   }
@@ -293,7 +318,15 @@
     this.signSources = new Map([
       ['HELLO', chrome.runtime.getURL('assets/signs/hello.webm')],
       ['TODAY', chrome.runtime.getURL('assets/signs/today.webm')],
-      ['MEETING', chrome.runtime.getURL('assets/signs/meeting.webm')]
+      ['MEETING', chrome.runtime.getURL('assets/signs/meeting.webm')],
+      ['TEAM', chrome.runtime.getURL('assets/signs/team.webm')],
+      ['PROJECT', chrome.runtime.getURL('assets/signs/project.webm')],
+      ['QUESTION', chrome.runtime.getURL('assets/signs/question.webm')],
+      ['HELP', chrome.runtime.getURL('assets/signs/help.webm')],
+      ['THANK-YOU', chrome.runtime.getURL('assets/signs/thanks.webm')],
+      ['THANKS', chrome.runtime.getURL('assets/signs/thanks.webm')],
+      ['GOOD', chrome.runtime.getURL('assets/signs/good.webm')],
+      ['LATER', chrome.runtime.getURL('assets/signs/later.webm')]
     ]);
     this.defaultGloss = 'HELLO';
     videoEl.loop = false;

@@ -10,7 +10,8 @@ const defaultState = {
   lastError: null
 };
 const defaultConfig = {
-  apiBaseUrl: 'http://localhost:5055/api/v1'
+  apiBaseUrl: 'http://localhost:5055/api/v1',
+  overlayScale: 'medium'
 };
 
 const DEMO_SIGN_SEQUENCES = [
@@ -49,7 +50,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       return { ok: true, config };
     },
     'popup:set-config': async () => {
-      const config = await setConfig({ apiBaseUrl: sanitizeApiBase(message.apiBaseUrl) });
+      const patch = {};
+      if (typeof message.apiBaseUrl === 'string') {
+        patch.apiBaseUrl = sanitizeApiBase(message.apiBaseUrl);
+      }
+      if (typeof message.overlayScale === 'string') {
+        patch.overlayScale = sanitizeOverlayScale(message.overlayScale);
+      }
+      const config = await setConfig(patch);
       return { ok: true, config };
     },
     'popup:test-api': async () => {
@@ -259,6 +267,14 @@ function sanitizeApiBase(value) {
     return defaultConfig.apiBaseUrl;
   }
   return value.trim().replace(/\s+/g, '');
+}
+
+function sanitizeOverlayScale(value) {
+  const allowed = ['small', 'medium', 'large'];
+  if (allowed.includes(value)) {
+    return value;
+  }
+  return defaultConfig.overlayScale;
 }
 
 async function pingApi(apiBaseUrl) {

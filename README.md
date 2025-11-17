@@ -6,7 +6,7 @@ The project currently contains:
 
 - **Extension frontend** (manifest v3) – `manifest.json`, `popup.*`, `contentScript.js`, `overlay.css`, `service-worker.js`, and assets under `assets/`.
 - **Backend service** – `backend/` Node 18+ app powered by Express, Gemini APIs, and Qdrant-compatible sign lookup logic.
-- **Demo assets** – placeholder icon PNGs and WebM sign clips for HELLO/TODAY/MEETING to visualize the experience before the AI pipeline is fully integrated.
+- **Demo assets** – placeholder icon PNGs and WebM sign clips for 10 core glosses (HELLO, TODAY, MEETING, TEAM, PROJECT, QUESTION, HELP, THANK-YOU, GOOD, LATER) to visualize the experience before the AI pipeline is fully integrated.
 
 Use this README as the canonical reference for architecture, file locations, and remaining work for future contributors.
 
@@ -47,8 +47,8 @@ SignFlow Browser extension/
 | Popup UI | Toggle switch, status indicators (idle/pending/listening/streaming/error), chunk counter, last gloss list, overlay reset, toast messaging | `popup.html`, `popup.css`, `popup.js` |
 | Audio capture | Web Audio microphone capture, MediaRecorder chunking, analyser-based level meter, permission handling | `contentScript.js` |
 | Streaming | Each audio chunk is encoded to base64 and posted to `/api/v1/sign-sequence` (configurable API base), with automatic fallback to deterministic demo glosses if the backend errors | `contentScript.js`, `service-worker.js` |
-| Overlay | Draggable floating video card with live captions, status header, mic level visual, and per-gloss video playback sourcing either bundled assets or backend URLs | `contentScript.js`, `overlay.css`, `assets/signs/` |
-| Backend controls | Popup lets you set/test the backend base URL and surfaces the last error message whenever the API fails, so QA/devs can switch between environments without rebuilding | `popup.html`, `popup.js`, `service-worker.js` |
+| Overlay | Draggable floating video card with live captions, status header, mic level visual, and per-gloss video playback sourcing either bundled assets or backend URLs. Size presets (S/M/L) are applied instantly and synced via storage. | `contentScript.js`, `overlay.css`, `assets/signs/` |
+| Backend + overlay controls | Popup lets you set/test the backend base URL, adjust the overlay size preset, and surfaces the last error message whenever the API fails, so QA/devs can switch environments without rebuilding | `popup.html`, `popup.js`, `service-worker.js` |
 
 ### How The Extension Communicates
 
@@ -69,9 +69,9 @@ SignFlow Browser extension/
 
 ### Next Frontend Enhancements
 
-- **Extended sign media** – add the AI-generated catalogue (40–50 clips) to the extension bundle or host on a CDN once the backend exposes them.
+- **Production sign media** – replace the placeholder WebM clips with the Grok-generated catalogue (40–50 clips) and refine compression/looping.
 - **Permissions polishing** – consider microphone capture persistence (offscreen document) to survive tab refreshes without requiring the popup toggle each time.
-- **Overlay personalization** – allow users to resize, theme, or pin the floating video card for different meeting layouts.
+- **Advanced overlay personalization** – add theme/opacity presets and optional captions for transcripts when backend returns them.
 
 ---
 
@@ -126,8 +126,9 @@ npm run dev            # starts on http://localhost:5055
   1. `chrome://extensions` → enable Developer Mode → “Load unpacked” → select this folder.
   2. Open the popup, toggle ON, allow microphone access.
   3. Set the backend endpoint under “Backend endpoint” (defaults to `http://localhost:5055/api/v1`) and hit **Test** to confirm connectivity.
-  4. With the backend running, observe requests to `/api/v1/sign-sequence` in DevTools → Network.
-  5. Use the “Show overlay again” button if the draggable card is lost.
+  4. Pick an overlay size preset that works with your call layout (Small/Medium/Large).
+  5. With the backend running, observe requests to `/api/v1/sign-sequence` in DevTools → Network.
+  6. Use the “Show overlay again” button if the draggable card is lost.
 
 ---
 

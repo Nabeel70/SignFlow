@@ -30,6 +30,14 @@
   transform: translateY(8px) scale(0.98);
 }
 
+.signflow-overlay[data-scale='small'] {
+  width: 260px;
+}
+
+.signflow-overlay[data-scale='large'] {
+  width: 380px;
+}
+
 .signflow-header {
   display: flex;
   justify-content: space-between;
@@ -134,4 +142,12 @@
 
 .signflow-overlay[data-state='error'] .signflow-status-text {
   color: var(--signflow-error);
+}
+
+.signflow-overlay[data-scale='small'] .signflow-video {
+  height: 170px;
+}
+
+.signflow-overlay[data-scale='large'] .signflow-video {
+  height: 240px;
 }

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>SignFlow Control</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="popup">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">SignFlow</p>
+          <h1>Real-time sign interpreter</h1>
+          <p class="subhead">Stream mic audio -> gloss lookup -> GIF overlay.</p>
+        </div>
+        <button id="refreshBtn" class="ghost-btn" type="button" title="Refresh status">
+          Refresh
+        </button>
+      </header>
+
+      <section class="toggle-row">
+        <label class="switch">
+          <input type="checkbox" id="powerToggle" />
+          <span class="slider" aria-hidden="true"></span>
+        </label>
+        <div class="switch-copy">
+          <p class="title">Extension</p>
+          <p class="hint">Enable mic capture + overlay</p>
+        </div>
+      </section>
+
+      <section class="status-card" data-state="idle">
+        <div class="status-light" id="statusDot"></div>
+        <div>
+          <p class="status-title" id="statusTitle">Idle</p>
+          <p class="status-sub" id="statusSubtitle">Flip the switch to start listening.</p>
+        </div>
+      </section>
+
+      <section class="stats">
+        <div>
+          <p class="label">Last gloss sequence</p>
+          <p class="value" id="lastSequence">--</p>
+        </div>
+        <div>
+          <p class="label">Audio chunks sent</p>
+          <p class="value" id="chunkCount">0</p>
+        </div>
+      </section>
+
+      <section class="actions">
+        <button id="overlayBtn" type="button" class="primary-btn">Show overlay again</button>
+      </section>
+
+      <p class="footnote">
+        Prototype stack &middot; Chrome Extension MV3, Web Audio API, Gemini STT placeholder
+      </p>
+      <div class="toast hidden" id="toast"></div>
+    </main>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

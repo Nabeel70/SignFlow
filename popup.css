@@ -1,0 +1,237 @@
+:root {
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #0f172a;
+  background: #050614;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-width: 360px;
+  background: #050614;
+}
+
+.popup {
+  padding: 20px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: #f8fafc;
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  background: linear-gradient(130deg, #10264a, #13385c 60%, #12444b);
+  border-radius: 18px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hero h1 {
+  margin: 4px 0;
+  font-size: 1.15rem;
+}
+
+.eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.subhead {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+}
+
+.ghost-btn {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  border-radius: 999px;
+  width: 36px;
+  height: 36px;
+  color: #f8fafc;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(10, 20, 40, 0.7);
+}
+
+.switch {
+  position: relative;
+  display: inline-flex;
+  width: 54px;
+  height: 28px;
+}
+
+.switch input {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+}
+
+.slider {
+  flex: 1;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  transition: background 0.2s ease;
+}
+
+.slider::after {
+  content: '';
+  width: 22px;
+  height: 22px;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  border-radius: 50%;
+  background: #ffffff;
+  transition: transform 0.2s ease;
+}
+
+.switch input:checked + .slider {
+  background: linear-gradient(120deg, #2af598, #009efd);
+}
+
+.switch input:checked + .slider::after {
+  transform: translateX(26px);
+}
+
+.switch-copy .title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.switch-copy .hint {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.8rem;
+}
+
+.status-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 18px;
+  padding: 16px;
+  background: rgba(10, 28, 46, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.status-light {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+}
+
+.status-card[data-state='idle'] .status-light {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.status-card[data-state='listening'] .status-light {
+  background: #3be0ff;
+  box-shadow: 0 0 16px rgba(59, 224, 255, 0.6);
+}
+
+.status-card[data-state='streaming'] .status-light {
+  background: #7df69f;
+  box-shadow: 0 0 16px rgba(125, 246, 159, 0.6);
+}
+
+.status-card[data-state='error'] .status-light {
+  background: #ff7b7b;
+  box-shadow: 0 0 16px rgba(255, 123, 123, 0.6);
+}
+
+.status-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.status-sub {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.stats > div {
+  background: rgba(16, 35, 60, 0.8);
+  border-radius: 16px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.label {
+  margin: 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.value {
+  margin: 6px 0 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #05132b;
+  cursor: pointer;
+  background: linear-gradient(120deg, #2ee7ff, #8df5b7);
+}
+
+.footnote {
+  margin: 0;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.toast {
+  text-align: center;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.toast.hidden {
+  display: none;
+}

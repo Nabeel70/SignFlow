@@ -1,0 +1,137 @@
+:root {
+  --signflow-bg: rgba(7, 12, 22, 0.92);
+  --signflow-border: rgba(124, 214, 255, 0.4);
+  --signflow-radius: 16px;
+  --signflow-text: #f9fdff;
+  --signflow-accent: #6cd5ff;
+  --signflow-error: #ffa4a4;
+  font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.signflow-overlay {
+  position: fixed;
+  top: 96px;
+  right: 32px;
+  width: 320px;
+  z-index: 2147483646;
+  color: var(--signflow-text);
+  border-radius: var(--signflow-radius);
+  border: 1px solid var(--signflow-border);
+  background: var(--signflow-bg);
+  box-shadow: 0 20px 60px rgba(6, 7, 16, 0.65);
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.signflow-overlay.signflow-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px) scale(0.98);
+}
+
+.signflow-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  cursor: move;
+  background: linear-gradient(120deg, rgba(15, 33, 46, 0.9), rgba(18, 55, 73, 0.9));
+}
+
+.signflow-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.signflow-status-text {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.signflow-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.signflow-level {
+  width: 90px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+}
+
+.signflow-level-bar {
+  width: 100%;
+  height: 100%;
+  transform-origin: left center;
+  background: linear-gradient(90deg, #2ee7ff, #8df5b7);
+}
+
+.signflow-collapse {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--signflow-text);
+  background: transparent;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.signflow-collapse:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.signflow-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+}
+
+.signflow-video {
+  width: 100%;
+  height: 200px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #050b16;
+}
+
+.signflow-caption {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-align: center;
+  padding: 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.signflow-overlay.signflow-collapsed .signflow-body {
+  display: none;
+}
+
+.signflow-overlay[data-state='pending'] .signflow-status-text {
+  color: #c2f1ff;
+}
+
+.signflow-overlay[data-state='listening'] .signflow-status-text {
+  color: var(--signflow-accent);
+}
+
+.signflow-overlay[data-state='streaming'] .signflow-status-text {
+  color: #a5ffb3;
+}
+
+.signflow-overlay[data-state='error'] .signflow-status-text {
+  color: var(--signflow-error);
+}

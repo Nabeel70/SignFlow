@@ -1,11 +1,24 @@
 :root {
-  --signflow-bg: rgba(7, 12, 22, 0.92);
-  --signflow-border: rgba(124, 214, 255, 0.4);
-  --signflow-radius: 16px;
-  --signflow-text: #f9fdff;
-  --signflow-accent: #6cd5ff;
-  --signflow-error: #ffa4a4;
-  font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --signflow-bg: rgba(9, 12, 20, 0.92);
+  --signflow-surface: rgba(16, 20, 33, 0.85);
+  --signflow-border: rgba(111, 132, 255, 0.45);
+  --signflow-radius: 20px;
+  --signflow-text: #f5f7ff;
+  --signflow-accent: #81f8ff;
+  --signflow-active: #3d7bff;
+  --signflow-error: #ff8c8c;
+  font-family: 'Space Grotesk', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+@keyframes signflow-pop {
+  0% {
+    transform: translateY(12px) scale(0.96);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
 }
 
 .signflow-overlay {
@@ -18,10 +31,11 @@
   border-radius: var(--signflow-radius);
   border: 1px solid var(--signflow-border);
   background: var(--signflow-bg);
-  box-shadow: 0 20px 60px rgba(6, 7, 16, 0.65);
-  backdrop-filter: blur(12px);
+  box-shadow: 0 24px 70px rgba(5, 8, 17, 0.65);
+  backdrop-filter: blur(14px);
   overflow: hidden;
-  transition: transform 0.25s ease, opacity 0.25s ease;
+  animation: signflow-pop 280ms ease forwards;
+  transform-origin: top right;
 }
 
 .signflow-overlay.signflow-hidden {
@@ -43,22 +57,24 @@
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  padding: 12px 16px;
+  padding: 16px 20px;
   cursor: move;
-  background: linear-gradient(120deg, rgba(15, 33, 46, 0.9), rgba(18, 55, 73, 0.9));
+  background: radial-gradient(circle at 20% -10%, rgba(61, 123, 255, 0.65), transparent 55%),
+    radial-gradient(circle at 80% -40%, rgba(129, 248, 255, 0.45), transparent 60%),
+    rgba(8, 12, 25, 0.95);
 }
 
 .signflow-label {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   margin: 0;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.62);
 }
 
 .signflow-status-text {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
 }
 
@@ -69,10 +85,10 @@
 }
 
 .signflow-level {
-  width: 90px;
-  height: 4px;
+  width: 110px;
+  height: 5px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.18);
   overflow: hidden;
 }
 
@@ -80,48 +96,56 @@
   width: 100%;
   height: 100%;
   transform-origin: left center;
-  background: linear-gradient(90deg, #2ee7ff, #8df5b7);
+  background: linear-gradient(90deg, var(--signflow-active), var(--signflow-accent));
+  transition: transform 180ms ease-out;
 }
 
 .signflow-collapse {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   color: var(--signflow-text);
-  background: transparent;
+  background: rgba(255, 255, 255, 0.05);
   font-size: 1.2rem;
   cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 .signflow-collapse:hover {
   border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.05);
 }
 
 .signflow-body {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 16px;
+  gap: 12px;
+  padding: 18px 20px 20px;
+  background: var(--signflow-surface);
 }
 
 .signflow-video {
   width: 100%;
   height: 200px;
-  border-radius: 12px;
+  border-radius: 18px;
   object-fit: cover;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: #050b16;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: radial-gradient(circle at 20% 20%, rgba(61, 123, 255, 0.2), rgba(3, 7, 19, 0.95));
+  box-shadow: inset 0 1px 8px rgba(0, 0, 0, 0.35);
 }
 
 .signflow-caption {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-align: center;
-  padding: 6px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.1);
+  padding: 10px 6px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-transform: uppercase;
 }
 
 .signflow-overlay.signflow-collapsed .signflow-body {

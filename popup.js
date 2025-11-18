@@ -90,9 +90,14 @@ async function handleToggle(event) {
   if (loading) {
     return;
   }
+  const tabId = await getActiveTabId();
+  if (!tabId) {
+    showToast('Open a regular web page (not chrome://) before enabling.', true);
+    elements.toggle.checked = false;
+    return;
+  }
   setLoading(true);
   try {
-    const tabId = await getActiveTabId();
     const response = await chrome.runtime.sendMessage({
       type: 'popup:toggle',
       enable,

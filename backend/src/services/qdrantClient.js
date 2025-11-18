@@ -1,7 +1,10 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
+import { createRequire } from 'module';
 import { config } from '../config.js';
 import { logger } from '../logger.js';
-import signs from '../../data/signGlosses.json' assert { type: 'json' };
+
+const require = createRequire(import.meta.url);
+const signs = require('../../data/signGlosses.json');
 
 const hasQdrant = Boolean(config.qdrant.url);
 const qdrant =

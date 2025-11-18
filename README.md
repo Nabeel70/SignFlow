@@ -6,7 +6,7 @@ The project currently contains:
 
 - **Extension frontend** (manifest v3) – `manifest.json`, `popup.*`, `contentScript.js`, `overlay.css`, `service-worker.js`, and assets under `assets/`.
 - **Backend service** – `backend/` Node 18+ app powered by Express, Gemini APIs, and Qdrant-compatible sign lookup logic.
-- **Demo assets** – placeholder icon PNGs and WebM sign clips for 10 core glosses (HELLO, TODAY, MEETING, TEAM, PROJECT, QUESTION, HELP, THANK-YOU, GOOD, LATER) to visualize the experience before the AI pipeline is fully integrated.
+- **Demo assets** - placeholder icon PNGs and WebM sign clips for 10 core glosses (HELLO, TODAY, MEETING, TEAM, PROJECT, QUESTION, HELP, THANK-YOU, GOOD, LATER) to visualize the experience before the AI pipeline is fully integrated. These clips are mirrored to Firebase Storage so the backend can return HTTPS URLs.
 
 Use this README as the canonical reference for architecture, file locations, and remaining work for future contributors.
 
@@ -84,10 +84,11 @@ See `backend/README.md` for setup, but here is the quick summary.
 - Express 5 for HTTP routing (`src/index.js`).
 - Pino for structured logging with `pino-pretty` in development.
 - Google Generative AI client for:
-  - `transcribeAudio` – speech-to-text with `gemini-1.5-flash`.
-  - `simplifySentence` – prompts for ASL-friendly keywords/gloss sequences as JSON.
+  - `transcribeAudio` – speech-to-text with `gemini-2.0-flash` (configurable).
+  - `simplifySentence` – prompts for ASL-friendly keywords/gloss sequences as JSON (default `gemini-2.0-flash`).
   Both methods include deterministic fallbacks when `GEMINI_API_KEY` is not set.
 - Qdrant (optional) for vector search over gloss embeddings. When absent, the `SignRepository` falls back to `data/signGlosses.json` and a keyword-overlap heuristic.
+- Firebase Storage bucket (default `pak-drive.appspot.com`) hosts the sign animation videos/CDN; scripts/uploadAssets.js pushes local assets and makes them public.
 - CDN abstraction via `SIGNFLOW_CDN_BASE_URL` so video URLs can be served from Firebase Storage, CloudFront, etc.
 
 ### Key Endpoints
@@ -102,12 +103,14 @@ See `backend/README.md` for setup, but here is the quick summary.
 
 ```bash
 cd backend
-cp .env.example .env   # add keys
 npm install
+cp .env.example .env   # already populated in repo; adjust if deploying elsewhere
+npm run sync:assets    # uploads assets/signs to Firebase Storage
+npm run sync:qdrant    # creates & upserts into the Qdrant collection
 npm run dev            # starts on http://localhost:5055
 ```
 
-`service-worker.js` expects the base URL `http://localhost:5055/api/v1`; change it if you deploy elsewhere.
+`service-worker.js` expects the base URL `http://localhost:5055/api/v1`; after deploying, set the popup “Backend endpoint” to your public URL.
 
 ### Remaining Backend / AI Tasks
 

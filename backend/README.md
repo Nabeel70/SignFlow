@@ -10,12 +10,28 @@ Gemini + Qdrant powered API that converts microphone audio into ASL gloss sequen
 
 ## Setup
 
-```bash
-cd backend
-cp .env.example .env # add API keys
-npm install
-npm run dev
-```
+1. `cd backend && npm install`
+2. Copy `.env.example` → `.env` and fill in:
+   - `GEMINI_API_KEY` (provided)
+   - `QDRANT_URL`, `QDRANT_API_KEY`, `QDRANT_COLLECTION`
+   - `SIGNFLOW_BUCKET` (e.g., `pak-drive.appspot.com`)
+   - `SIGNFLOW_CDN_BASE_URL` (e.g., `https://storage.googleapis.com/pak-drive.appspot.com/signs/`)
+   - `GOOGLE_APPLICATION_CREDENTIALS=./firebase-service-account.json`
+3. Place your Firebase Admin SDK JSON as `firebase-service-account.json` (already provided for SignFlow).
+4. Upload the local demo assets to Firebase Storage:
+   ```bash
+   npm run sync:assets
+   ```
+   This uploads `assets/signs/*.webm` to `gs://<bucket>/signs/*` and makes them public.
+5. Seed Qdrant with the gloss metadata:
+   ```bash
+   npm run sync:qdrant
+   ```
+   The script creates (if needed) and upserts into `signflow_signs`.
+6. Start the backend:
+   ```bash
+   npm run dev
+   ```
 
 The server listens on `http://localhost:5055` by default and exposes the following endpoints under `/api/v1`.
 
@@ -53,3 +69,9 @@ When audio is omitted you can pass an existing transcript:
 ## Connecting The Extension
 
 The Chrome extension service worker posts microphone chunks to `POST /api/v1/sign-sequence`. Set the desired endpoint inside the extension popup (Backend endpoint section) if you deploy the backend to another host.
+
+## Deployment Notes
+
+- The backend is a standard Node app and runs on Render, Railway, Fly, Cloud Run, etc. Provide the same environment variables from `.env` when deploying.
+- Ensure the production deployment runs behind HTTPS so the Chrome extension can reach it without mixed-content warnings.
+- `/health` is a lightweight GET endpoint used by the popup “Test” button; make sure it is exposed publicly.

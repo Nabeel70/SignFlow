@@ -8,8 +8,8 @@ export const config = {
   frontendOrigin: process.env.FRONTEND_ORIGIN || '*',
   gemini: {
     apiKey: process.env.GEMINI_API_KEY || '',
-    speechModel: process.env.GEMINI_SPEECH_MODEL || 'gemini-1.5-flash',
-    textModel: process.env.GEMINI_TEXT_MODEL || 'gemini-1.5-flash'
+    speechModel: process.env.GEMINI_SPEECH_MODEL || 'gemini-2.0-flash',
+    textModel: process.env.GEMINI_TEXT_MODEL || 'gemini-2.0-flash'
   },
   qdrant: {
     url: process.env.QDRANT_URL || '',

@@ -26,6 +26,15 @@ app.get('/health', (req, res) => {
   });
 });
 
+app.get('/api/v1/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    env: config.env,
+    qdrant: Boolean(config.qdrant.url),
+    gemini: Boolean(config.gemini.apiKey)
+  });
+});
+
 app.use('/api/v1', signflowRoutes);
 
 // eslint-disable-next-line no-unused-vars

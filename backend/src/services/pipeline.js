@@ -97,5 +97,8 @@ function buildAssetUrl(fileName) {
   if (fileName.startsWith('http')) {
     return fileName;
   }
-  return `${config.pipeline.cdnBaseUrl}${fileName}`;
+  const base = config.pipeline.cdnBaseUrl?.endsWith('/')
+    ? config.pipeline.cdnBaseUrl
+    : `${config.pipeline.cdnBaseUrl}/`;
+  return `${base}${encodeURIComponent(fileName)}`;
 }

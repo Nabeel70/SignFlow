@@ -7,7 +7,9 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "lint": "node --check src/index.js"
+    "lint": "node --check src/index.js",
+    "sync:assets": "node scripts/uploadAssets.js",
+    "sync:qdrant": "node scripts/syncQdrant.js"
   },
   "keywords": [
     "signflow",
@@ -24,6 +26,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "firebase-admin": "^13.6.0",
     "node-fetch": "^3.3.2",
     "pino": "^10.1.0",
     "uuid": "^13.0.0"

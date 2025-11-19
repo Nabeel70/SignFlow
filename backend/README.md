@@ -7,6 +7,7 @@ Gemini + Qdrant powered API that converts microphone audio into ASL gloss sequen
 - Node 18+
 - (Optional) Google Gemini API key for transcription + text simplification
 - (Optional) Qdrant cluster for vector based sign lookup
+- (Optional) Python 3.8+ for local STT server (faster-whisper)
 
 ## Setup
 
@@ -17,18 +18,29 @@ Gemini + Qdrant powered API that converts microphone audio into ASL gloss sequen
    - `SIGNFLOW_BUCKET` (e.g., `pak-drive.appspot.com`)
    - `SIGNFLOW_CDN_BASE_URL` (e.g., `https://storage.googleapis.com/pak-drive.appspot.com/signs/`)
    - `GOOGLE_APPLICATION_CREDENTIALS=./firebase-service-account.json`
+   - (Optional) `LOCAL_STT_ENABLED=true` and `LOCAL_STT_URL=http://127.0.0.1:6000` to use the local STT server
 3. Place your Firebase Admin SDK JSON as `firebase-service-account.json` (already provided for SignFlow).
-4. Upload the local demo assets to Firebase Storage:
+4. (Optional) Set up the local STT server for faster, offline transcription:
+   ```bash
+   cd python
+   python -m venv venv
+   # On Windows: venv\Scripts\activate
+   # On macOS/Linux: source venv/bin/activate
+   pip install -r requirements.txt
+   python stt_server.py --model tiny --port 6000
+   ```
+   See `python/README.md` for detailed setup instructions.
+5. Upload the local demo assets to Firebase Storage:
    ```bash
    npm run sync:assets
    ```
    This uploads `assets/signs/*.webm` to `gs://<bucket>/signs/*` and makes them public.
-5. Seed Qdrant with the gloss metadata:
+6. Seed Qdrant with the gloss metadata:
    ```bash
    npm run sync:qdrant
    ```
    The script creates (if needed) and upserts into `signflow_signs`.
-6. Start the backend:
+7. Start the backend:
    ```bash
    npm run dev
    ```
@@ -62,6 +74,7 @@ When audio is omitted you can pass an existing transcript:
 
 ## Fallback Behaviour
 
+- If `LOCAL_STT_ENABLED=true`, the backend will try the local Python STT server first. If it fails, it falls back to Gemini.
 - If no Gemini key is provided the server returns deterministic demo transcripts and keyword extraction.
 - When Qdrant is not configured, the service falls back to the bundled `data/signGlosses.json` catalogue and a keyword overlap heuristic.
 - CDN/asset URLs default to `https://storage.googleapis.com/signflow-demo/signs/` but can be changed via `SIGNFLOW_CDN_BASE_URL`.

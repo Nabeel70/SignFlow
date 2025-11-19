@@ -2,10 +2,22 @@
 
 SignFlow is a Chrome extension + API stack that listens to web-conference audio, streams it to an AI-driven backend, and overlays sign-language animations on top of any tab so Deaf or hard-of-hearing participants can follow the conversation in real time.
 
+> **🚀 NEW: Complete Setup Guide Available!**
+> 
+> See **[SETUP_GUIDE.md](SETUP_GUIDE.md)** for step-by-step instructions to get SignFlow running with local Speech-to-Text support.
+>
+> **Quick Start:**
+> 1. Set up Python STT server (optional, for local transcription)
+> 2. Start Node backend
+> 3. Load Chrome extension
+> 
+> The system now includes a resilient three-tier transcription fallback: Local STT → Gemini API → Mock
+
 The project currently contains:
 
 - **Extension frontend** (manifest v3) – `manifest.json`, `popup.*`, `contentScript.js`, `overlay.css`, `service-worker.js`, and assets under `assets/`.
 - **Backend service** – `backend/` Node 18+ app powered by Express, Gemini APIs, and Qdrant-compatible sign lookup logic.
+- **Python STT server** (optional) – `backend/python/` Flask server using faster-whisper for local, private speech-to-text transcription.
 - **Demo assets** - placeholder icon PNGs and WebM sign clips for 10 core glosses (HELLO, TODAY, MEETING, TEAM, PROJECT, QUESTION, HELP, THANK-YOU, GOOD, LATER) to visualize the experience before the AI pipeline is fully integrated. These clips are mirrored to Firebase Storage so the backend can return HTTPS URLs.
 
 Use this README as the canonical reference for architecture, file locations, and remaining work for future contributors.
@@ -20,6 +32,10 @@ SignFlow Browser extension/
 │   ├── icons/icon-{16,48,128}.png      # Extension action icons
 │   └── signs/*.webm                    # Demo sign animations
 ├── backend/
+│   ├── python/                          # Optional local STT server
+│   │   ├── stt_server.py               # Flask server with Whisper
+│   │   ├── requirements.txt            # Python dependencies
+│   │   └── README.md                   # Python server setup guide
 │   ├── data/signGlosses.json           # Local fallback catalogue of gloss metadata
 │   ├── src/
 │   │   ├── config.js                   # Env + port + external service config
@@ -32,7 +48,10 @@ SignFlow Browser extension/
 ├── overlay.css                         # Styling for floating video box
 ├── manifest.json                       # MV3 definition
 ├── popup.html / popup.css / popup.js   # Control UI for enabling/disabling SignFlow
-└── service-worker.js                   # Extension background logic + backend bridge
+├── service-worker.js                   # Extension background logic + backend bridge
+├── SETUP_GUIDE.md                      # Complete setup instructions
+├── FIX_VERIFICATION.md                 # Testing and verification guide
+└── FIX_SUMMARY.md                      # Summary of recent improvements
 ```
 
 ---

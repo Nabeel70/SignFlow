@@ -11,6 +11,10 @@ export const config = {
     speechModel: process.env.GEMINI_SPEECH_MODEL || 'gemini-2.0-flash',
     textModel: process.env.GEMINI_TEXT_MODEL || 'gemini-2.0-flash'
   },
+  localSTT: {
+    url: process.env.LOCAL_STT_URL || 'http://127.0.0.1:6000',
+    enabled: process.env.LOCAL_STT_ENABLED === 'true'
+  },
   qdrant: {
     url: process.env.QDRANT_URL || '',
     apiKey: process.env.QDRANT_API_KEY || '',

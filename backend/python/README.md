@@ -34,7 +34,7 @@ python stt_server.py --model tiny --port 6001
 ### Options
 
 - `--model`: Whisper model size (tiny, base, small, medium, large-v2, large-v3). Default: tiny
-- `--port`: Port to run the server on. Default: 6000
+- `--port`: Port to run the server on. Default: 6001
 - `--host`: Host to bind to. Default: 127.0.0.1
 - `--device`: Device to run model on (cpu, cuda). Default: cpu
 

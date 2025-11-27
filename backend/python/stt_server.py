@@ -75,7 +75,7 @@ def transcribe_audio_data(audio_data: bytes, language: Optional[str] = None) -> 
     try:
         segments, info = model.transcribe(
             tmp_path,
-            language=language[:2] if language else None,  # Use 2-letter code
+            language=language[:2] if language and len(language) >= 2 else None,  # Use 2-letter code
             beam_size=5,
             vad_filter=True
         )

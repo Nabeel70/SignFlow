@@ -1,8 +1,8 @@
-""backend/firebase-service-account.json"
+backend/firebase-service-account.json
 backend/.env
 node_modules/
 *.log
 .DS_Store
 backend/python/venv/
 __pycache__/
-*.pyc" 
+*.pyc

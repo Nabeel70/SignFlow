@@ -11,6 +11,19 @@ export class GeminiClient {
     if (!audioBase64) {
       throw new Error('audioBase64 payload missing');
     }
+
+    // Try local STT server first if configured
+    if (config.localStt.url) {
+      try {
+        const localResult = await this.tryLocalStt({ audioBase64, mimeType, locale });
+        if (localResult) {
+          return localResult;
+        }
+      } catch (error) {
+        logger.warn({ err: error }, 'Local STT failed, using fallback transcript');
+      }
+    }
+
     if (!hasApiKey) {
       return this.mockTranscription(locale);
     }
@@ -39,6 +52,44 @@ export class GeminiClient {
     } catch (error) {
       logger.warn({ err: error }, 'Gemini transcription failed, falling back to heuristic');
       return this.mockTranscription(locale);
+    }
+  }
+
+  async tryLocalStt({ audioBase64, mimeType, locale }) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+    try {
+      const response = await fetch(`${config.localStt.url}/transcribe`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          audioBase64,
+          mimeType: mimeType || 'audio/webm',
+          locale: locale || config.pipeline.fallbackLocale
+        }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`Local STT HTTP ${response.status}`);
+      }
+
+      const result = await response.json();
+      logger.info({ provider: 'local-stt', text: result.text?.substring(0, 50) }, 'Local STT succeeded');
+      return {
+        text: result.text || '',
+        locale: result.locale || locale || config.pipeline.fallbackLocale,
+        confidence: result.confidence || 0.8,
+        provider: 'whisper'
+      };
+    } catch (error) {
+      clearTimeout(timeoutId);
+      throw error;
     }
   }
 

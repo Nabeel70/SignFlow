@@ -21,5 +21,8 @@ export const config = {
     cdnBaseUrl:
       process.env.SIGNFLOW_CDN_BASE_URL ||
       'https://storage.googleapis.com/signflow-demo/signs/'
+  },
+  localStt: {
+    url: process.env.LOCAL_STT_URL || 'http://127.0.0.1:6001'
   }
 };

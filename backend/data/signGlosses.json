@@ -10,6 +10,36 @@
     "embedding": [0.9, 0.1, 0.05]
   },
   {
+    "id": "everyone",
+    "gloss": "EVERYONE",
+    "keywords": ["everyone", "everybody", "all", "people"],
+    "topics": ["pronoun", "group"],
+    "videoFile": "everyone.webm",
+    "thumbnail": "everyone.png",
+    "durationMs": 2000,
+    "embedding": [0.7, 0.5, 0.4]
+  },
+  {
+    "id": "we",
+    "gloss": "WE",
+    "keywords": ["we", "us", "our"],
+    "topics": ["pronoun"],
+    "videoFile": "we.webm",
+    "thumbnail": "we.png",
+    "durationMs": 1500,
+    "embedding": [0.6, 0.3, 0.2]
+  },
+  {
+    "id": "have",
+    "gloss": "HAVE",
+    "keywords": ["have", "has", "got", "possess"],
+    "topics": ["verb"],
+    "videoFile": "have.webm",
+    "thumbnail": "have.png",
+    "durationMs": 1600,
+    "embedding": [0.5, 0.4, 0.3]
+  },
+  {
     "id": "today",
     "gloss": "TODAY",
     "keywords": ["today", "now", "currently"],
